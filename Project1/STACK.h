@@ -1,4 +1,13 @@
 #pragma once
+#include <malloc.h>
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+//#define NDEBUG
+#include <assert.h>
+#include <string>
+#include<cstring>
+#include <sstream>   
 typedef struct STACK {
 	int  *elems;	//申请内存用于存放栈的元素
 	int   max;	//栈能存放的最大元素个数
@@ -12,5 +21,7 @@ int  getelem(const STACK *const p, int x);	//取下标x处的栈元素
 STACK *const push(STACK *const p, int e); 	//将e入栈，并返回p
 STACK *const pop(STACK *const p, int& e); 	//出栈到e，并返回p
 STACK *const assign(STACK*const p, const STACK&s); //赋s给p指的栈,并返回p
+std::string getprint(const STACK*const p);			//返回p指向的栈的
 void print(const STACK*const p);			//打印p指向的栈
 void destroySTACK(STACK*const p);		//销毁p指向的栈
+

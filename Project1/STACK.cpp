@@ -1,10 +1,5 @@
-#include "STACK.h"
-#include <malloc.h>
-#include <stdio.h>
-#include <stdlib.h>
-//#define NDEBUG
-#include <assert.h>
-
+#include "STACK.h"   //要使用stringstream流应包含此头文件 
+using namespace std;
 void initSTACK(STACK * const p, int m)
 {
 	//assert(p);
@@ -78,12 +73,20 @@ STACK * const assign(STACK * const p, const STACK & s)
 	return p;
 }
 
-void print(const STACK * const p)
+std::string getprint(const STACK * const p)
 {
 	int i = 0;
+	stringstream res;
 	for (; i < p->pos; i++) {
-		printf("%d\t", p->elems[i]);
+		res <<p->elems[i]<<" ";
 	}
+	string end = p->pos!=0?res.str():"";
+	return end;
+}
+
+void print(const STACK * const p)
+{
+	cout << getprint(p) << endl;
 }
 
 void destroySTACK(STACK * const p)
@@ -92,3 +95,4 @@ void destroySTACK(STACK * const p)
 	p->max = 0;
 	p->pos = 0;
 }
+
