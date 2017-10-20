@@ -31,22 +31,29 @@ char * getOpenFile(char * filename) {
 	strcat(openfile, ".txt");
 	return openfile;
 }
-void carryS(int t){
+int carryS(int t){
 	write << t << " ";
 	initSTACK(stack, t);
+	return 0;
 }
-void carryI(int t) {
-	write << t << " ";
-	push(stack, t);
+int carryI(int t) {
+	//write << t << " ";
+	if (stack->pos >= stack->max) {
+		write << "E ";
+		return -1;
+	}else
+		push(stack, t);
+	return 0;
 }
-void carryO(int t) {
+int carryO(int t) {
 	int e;
 	//write << t << " ";
 	while (t != 0) {
 		pop(stack, e);
 		t--;
 	}
-	printStack();
+	//printStack();
+	return 0;
 }
 int main(int argc,char *argv[]) {
 	char *openfile = getOpenFile(argv[0]);
@@ -55,7 +62,7 @@ int main(int argc,char *argv[]) {
 	if (!write.is_open()) {
 		exit(-1);
 	}
-	void(*carry[3])(int);
+	int(*carry[3])(int);
 	carry[0] = carryS;
 	carry[1] = carryI;
 	carry[2] = carryO;
@@ -63,7 +70,10 @@ int main(int argc,char *argv[]) {
 	while (times < argc-1) {
 		times++;
 		if (isdigitstr(argv[times])) {
-			(*carry[kind])(atoi(argv[times]));
+			if (-1 == (*carry[kind])(atoi(argv[times]))) {
+				times = -1;
+				break;
+			}
 			continue;
 		}
 		if (argv[times][2] != '\0') {
@@ -71,26 +81,29 @@ int main(int argc,char *argv[]) {
 			write << "E ";
 			continue;
 		}
-		//print(stack);
+		printStack();
 		switch (argv[times][1])
 		{
 		case 'S':
 		case 's':kind = 0; write << "S "; break;
 		case 'I':
-		case 'i':kind = 1; write << "I "; printStack(); break;
+		case 'i':kind = 1; write << "I "; //printStack()
+			; break;
 		case 'O':
 		case 'o':kind = 2; write << "O "; break;
 		default:kind = -1; write << "E ";
 			break;
 		}
-		
 	}
+	if(times != -1)
+		printStack();
 	//carryS(10);
 	//carryI(1);
 	//print(stack);
 	//write << "this is version 1.0";
 	write.close();
-	system("type .\\Project1.txt");
-	system("pause");
+	system("type D:\\WorkSpace\\VS_C\\Cpp_expericen\\Project1\\Debug\\Project1.txt");
+	printf("\n");
+	//system("pause");
 	return 0;
 }
