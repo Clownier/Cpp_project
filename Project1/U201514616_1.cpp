@@ -47,12 +47,38 @@ int carryI(int t) {
 }
 int carryO(int t) {
 	int e;
+	if (t == 0)
+		return 0;
 	//write << t << " ";
+	if (t > stack->pos) {
+		write << "E";
+		return -1;
+	}
 	while (t != 0) {
 		pop(stack, e);
 		t--;
 	}
 	//printStack();
+	return 0;
+}
+int carryG(int t) {
+	if (t >= stack->pos) {
+		write << "E ";
+		return -1;
+	}
+	write << stack->elems[t] << " ";
+	return 0;
+}
+int carryA(int t) {
+	STACK *pNew = (STACK *)malloc(1 * sizeof(STACK));
+	initSTACK(pNew, t);
+	stack = assign(pNew, *stack);
+	return 0;
+}
+int carryC(int t) {
+	STACK *pNew = (STACK *)malloc(1 * sizeof(STACK));
+	initSTACK(pNew,*stack);
+	stack = pNew;
 	return 0;
 }
 int main(int argc,char *argv[]) {
@@ -62,10 +88,13 @@ int main(int argc,char *argv[]) {
 	if (!write.is_open()) {
 		exit(-1);
 	}
-	int(*carry[3])(int);
+	int(*carry[6])(int);
 	carry[0] = carryS;
 	carry[1] = carryI;
 	carry[2] = carryO;
+	carry[3] = carryG;
+	carry[4] = carryA;
+	carry[5] = carryC;
 	int kind = -1,times = 0;
 	while (times < argc-1) {
 		times++;
@@ -81,7 +110,8 @@ int main(int argc,char *argv[]) {
 			write << "E ";
 			continue;
 		}
-		printStack();
+		if(kind != 3&&kind!=-2)
+			printStack();
 		switch (argv[times][1])
 		{
 		case 'S':
@@ -91,11 +121,19 @@ int main(int argc,char *argv[]) {
 			; break;
 		case 'O':
 		case 'o':kind = 2; write << "O "; break;
+		case 'N':
+		case 'n':write << "N " << stack->pos<<" "; kind = -2; break;
+		case 'G':
+		case 'g':write << "G "; kind = 3; break;
+		case 'A':
+		case 'a':write << "A "; kind = 4; break;
+		case 'C':
+		case 'c':write << "C "; kind = -1; break;
 		default:kind = -1; write << "E ";
 			break;
 		}
 	}
-	if(times != -1)
+	if(times != -1&&kind>-2)
 		printStack();
 	//carryS(10);
 	//carryI(1);
