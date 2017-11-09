@@ -37,7 +37,7 @@ STACK & STACK::push(int e)throw(char *)
 	if (max <= pos)
 		throw "exception";
 	else {
-		elems[pos];
+		elems[pos] = e;
 		pos++;
 	}
 	return *this;
@@ -53,8 +53,13 @@ STACK & STACK::pop(int & e) throw(char *)
 
 STACK & STACK::assign(const STACK & s)
 {
-	STACK p(s);
-	return p;
+	const_cast<int *>(elems) = new int[s.max];
+	for (int i = 0; i < s.pos; i++) {
+		elems[i] = s.elems[i];
+	}
+	const_cast<int &>(max) = s.max;
+	pos = s.pos;
+	return *this;
 }
 
 std::string STACK::getprint() const
@@ -73,7 +78,11 @@ void STACK::print() const
 
 STACK::~STACK()
 {
-	free(elems);
-	const_cast<int &>(max) = 0;//const_cast change const data
-	pos = 0;
+	if (elems) {
+		free(elems);
+		const_cast<int &>(max) = 0;//const_cast change const data
+		pos = 0;
+	}
+
+
 }
