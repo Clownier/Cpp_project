@@ -5,9 +5,13 @@
 #include<fstream>
 #include <vector>
 #include<string>
+#include<algorithm>
 #include"QUEUE6.h"
+#define Partner_Problem //舞伴问题
+//#define TEXT  //出入队测试
 using namespace std;
 
+#ifdef TEXT
 ofstream write;
 QUEUE *pQueue = nullptr;
 int(*carry[6])(int);
@@ -96,6 +100,7 @@ int initFile(char *filename) {
 	carry[5] = carryG;
 	return 0;
 }
+
 int main(int argc, char *argv[]) {
 	initFile(argv[0]);
 	int kind = -1, times = 0;
@@ -144,3 +149,43 @@ int main(int argc, char *argv[]) {
 	system("pause");
 	return 0;
 }
+#endif // TEXT
+#ifdef Partner_Problem
+/*假定在一次舞会上，男士排成一队，
+女士排成另一队。每次舞曲响起时，从男队和女队的队头各出一人，
+配成舞伴跳完此曲，跳完后各自进入自己队列的尾部。
+若男女两队的初始人数分别为M和F（M和F均为素数，且M != F），
+男队中排在位置m（m <= M）的男士，非常想和女队位置f（f <= F）的女士跳舞，
+问他在第几支曲舞曲才能和该女士跳舞 ?*/
+int main() {
+	int M, F;
+	cout << "please input M and F:" << endl;
+	cin >> M >> F;
+	QUEUE *qMale = new QUEUE(M);
+	QUEUE *qFemale = new QUEUE(F);
+	for (int i = 0; i < max(M, F); i++) {
+		if (i < M)
+			*qMale << i+1;
+		if (i < F)
+			*qFemale << i+1;
+	}
+	int m, f, res = 0,c = 0;
+	cout << "please input m and f:" << endl;
+	cin >> m >> f;
+	while(true) {
+		c++;
+		*qFemale >> F;
+		*qMale >> M;
+		if (M == m) {
+			res++;
+			if (F == f)
+				break;
+		}
+		*qFemale << F;
+		*qMale << M;
+	}
+	cout << "On the " << res << "th rounds,they can dance together!" <<c<< endl;
+	system("pause");
+	return 0;
+}
+#endif // Partner_Problem
