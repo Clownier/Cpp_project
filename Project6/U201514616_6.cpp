@@ -6,10 +6,258 @@
 #include <vector>
 #include<string>
 #include<algorithm>
-#include"QUEUE6.h"
-#define Partner_Problem //舞伴问题
-//#define TEXT  //出入队测试
+//#define Partner_Problem //舞伴问题
+#define TEXT  //出入队测试
+
+
+#include <malloc.h>
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+//#define NDEBUG
+#include <assert.h>
+#include <string>
+#include<cstring>
+#include <sstream> 
+
+class STACK {
+	int  *const  elems;	//申请内存用于存放栈的元素
+	const  int   max;	//栈能存放的最大元素个数
+	int   pos;			//栈实际已有元素个数，栈空时pos=0;
+public:
+	STACK(int m);		//初始化栈：最多存m个元素
+	STACK(const STACK&s); 			//用栈s拷贝初始化栈
+	virtual int  size() const;			//返回栈的最大元素个数max
+	virtual operator int() const;			//返回栈的实际元素个数pos
+	virtual int operator[ ] (int x) const;	//取下标x处的栈元素，第1个元素x=0
+	virtual STACK& operator<<(int e); 	//将e入栈,并返回栈
+	virtual STACK& operator>>(int &e);	//出栈到e,并返回栈
+	virtual STACK& operator=(const STACK&s); //赋s给栈,并返回被赋值的栈
+	virtual void print() const;			//打印栈
+	virtual ~STACK();					//销毁栈
+	std::string getprint() const;		//赋s给栈,并返回被赋值的栈
+};
+
+class QUEUE :public STACK {
+	STACK  s2;
+	STACK &inStack = s2;
+public:
+	QUEUE(int m); //每个栈最多m个元素，要求实现的队列最多能入2m个元素
+	QUEUE(const QUEUE&s); 			//用队列s拷贝初始化队列
+	virtual operator int() const;			//返回队列的实际元素个数
+	virtual int full() const;		       //返回队列是否已满，满返回1，否则返回0
+	virtual int operator[ ](int x)const;   //取下标为x的元素，第1个元素下标为0
+	virtual QUEUE& operator<<(int e);  //将e入队列,并返回队列
+	virtual QUEUE& operator>>(int &e);	//出队列到e,并返回队列
+	virtual QUEUE& operator=(const QUEUE&s); //赋s给队列,并返回被赋值的队列
+	std::string getprint() const;
+	virtual void print() const;			//打印队列
+	virtual ~QUEUE();					//销毁队列
+};
 using namespace std;
+
+STACK::STACK(int m) :
+	max(m), elems((int *)malloc(m * sizeof(int))), pos(0)
+{
+	if (NULL == elems)
+		throw "construct fail!";
+}
+
+STACK::STACK(const STACK &s) throw () :
+	max(s.size()), pos(s.pos), elems((int *)malloc(s.max * sizeof(int)))
+{
+	if (NULL == elems)
+		throw "malloc fail!";
+	else
+		for (int i = 0; i < s.pos; i++) {
+			elems[i] = s.elems[i];
+		}
+}
+int STACK::size() const
+{
+	return max;
+}
+
+STACK::operator int() const
+{
+	return pos;
+}
+
+int STACK::operator[](int x) const
+{
+	if (x < 0 || x >= pos) {
+		throw "range_error";
+		return -1;
+	}
+	else
+		return elems[x];
+}
+
+STACK & STACK::operator<<(int e)
+{
+	// TODO: 在此处插入 return 语句
+	if (max <= pos)
+		throw "range_error";
+	else {
+		elems[pos++] = e;
+	}
+	return *this;
+}
+
+STACK & STACK::operator>>(int & e)
+{
+	// TODO: 在此处插入 return 语句
+	if (pos <= 0) {
+		throw "range_error";
+	}
+	else {
+		e = elems[--pos];
+	}
+	return *this;
+}
+
+STACK & STACK::operator=(const STACK & s)
+{
+	// TODO: 在此处插入 return 语句
+	const_cast<int &>(max) = s.size();
+	const_cast<int *>(elems) = new int[max];
+	pos = s;
+	for (int i = 0; i < pos; i++) {
+		elems[i] = s[i];
+	}
+	return *this;
+}
+
+std::string STACK::getprint() const {
+	std::stringstream res;
+	for (int i = 0; i < pos; i++) {
+		res << elems[i] << " ";
+	}
+	std::string end = pos != 0 ? res.str() : "";
+	return end;
+}
+
+void STACK::print() const {
+	std::cout << getprint() << std::endl;
+}
+
+STACK::~STACK() {
+	free(elems);
+	const_cast<int &>(max) = 0;
+	pos = 0;
+}
+
+
+QUEUE::QUEUE(int m) :
+	STACK(m), s2(m) {
+
+}
+
+QUEUE::QUEUE(const QUEUE& s) :
+	STACK(s), s2(s) {
+
+}
+
+QUEUE::operator int() const {
+	return STACK::operator int() + inStack;
+}
+
+int QUEUE::full() const {
+	if (inStack.size() <= inStack) {//入栈满
+		if (STACK::operator int()) {//出栈非空
+			return 1;
+		}
+	}
+	return 0;
+}
+
+int QUEUE::operator [](int x) const {
+	int res;
+	if (x >= STACK::operator int()) {
+		try {
+			res = inStack[x - STACK::operator int()];
+		}
+		catch (char *) {
+			throw "range_error!";
+			res = -1;
+		}
+	}
+	else {
+		try {
+			res = STACK::operator[](STACK::operator int() - x - 1);
+		}
+		catch (char *) {
+			throw "range_error!";
+			res = -1;
+		}
+	}
+	return res;
+}
+
+QUEUE& QUEUE::operator<<(int e) {
+	if (full()) {
+		throw "range_error";
+	}
+	else {
+		try {
+			inStack << e;
+		}
+		catch (char *) {
+			while (inStack) {
+				int temp;
+				inStack >> temp;
+				STACK::operator<<(temp);
+			}
+			inStack << e;
+		}
+	}
+	return *this;
+}
+
+QUEUE& QUEUE::operator>>(int &e) {
+	if (!inStack && !STACK::operator int()) {
+		throw"range_error";
+	}
+	try {
+		STACK::operator>>(e);
+	}
+	catch (char *) {
+		while (inStack) {
+			int temp;
+			inStack >> temp;
+			STACK::operator<<(temp);
+		}
+		STACK::operator>>(e);
+	}
+	return *this;
+}
+
+QUEUE& QUEUE::operator=(const QUEUE&s) {
+	try {
+		inStack = s.inStack;
+		STACK::operator=((STACK)s);
+	}
+	catch (char *) {
+		throw"new fail!";
+	}
+	return *this;
+}
+
+std::string QUEUE::getprint() const {
+	std::stringstream res;
+	for (int i = 0; i < (*this); i++) {
+		res << (*this)[i] << " ";
+	}
+	std::string end = *this == 0 ? "" : res.str();
+	return end;
+}
+
+void QUEUE::print() const {
+	std::cout << getprint() << std::endl;
+}
+QUEUE::~QUEUE() {
+	//STACK::~STACK();
+}
 
 #ifdef TEXT
 ofstream write;
@@ -144,9 +392,9 @@ int main(int argc, char *argv[]) {
 		printStack();
 	}
 	write.close();
-	system("type D:\\WorkSpace\\VS_C\\Cpp_expericen\\Project1\\Debug\\Project6.txt");
+	//system("type D:\\WorkSpace\\VS_C\\Cpp_expericen\\Project1\\Debug\\Project6.txt");
 	printf("\n");
-	system("pause");
+	//system("pause");
 	return 0;
 }
 #endif // TEXT

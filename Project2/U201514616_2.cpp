@@ -5,8 +5,125 @@
 #include<fstream>
 #include <vector>
 #include<string>
-#include"STACK2.h"
+#include <malloc.h>
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+//#define NDEBUG
+#include <assert.h>
+#include <string>
+#include<cstring>
+#include <sstream>   
+class STACK {
+	int  *const  elems;	//申请内存用于存放栈的元素
+	const  int   max;	//栈能存放的最大元素个数
+	int   pos;			//栈实际已有元素个数，栈空时pos=0;
+public:
+	STACK(int m);		//初始化栈：最多m个元素
+	STACK(const STACK&s); //用栈s拷贝初始化栈
+	int  size() const;		//返回栈的最大元素个数max
+	int  howMany() const;	//返回栈的实际元素个数pos
+	int  getelem(int x) const;	//取下标x处的栈元素
+	STACK& push(int e); 	//将e入栈,并返回栈
+	STACK& pop(int &e); 	//出栈到e,并返回栈
+	STACK& assign(const STACK&s);
+	std::string getprint() const;
+	//赋s给栈,并返回被赋值的栈
+	void print() const;		//打印栈
+	~STACK();				//销毁栈
+};
 using namespace std;
+
+STACK::STACK(int m) throw(char *) :
+	max(m), elems((int*)malloc(m * sizeof(int))), pos(0)
+{
+	if (NULL == elems)
+		throw "exception";
+}
+
+
+STACK::STACK(const STACK & s) :
+	max(s.max), elems(s.elems), pos(s.pos)
+{
+}
+
+int STACK::size() const
+{
+	return max;
+}
+
+int STACK::howMany() const
+{
+	return pos;
+}
+
+int STACK::getelem(int x) const throw(char *)
+{
+	if (x >= pos)
+		throw "exception";
+	else
+		return elems[x];
+	return -1;
+}
+
+STACK & STACK::push(int e)throw(char *)
+{
+	if (max <= pos)
+		throw "exception";
+	else {
+		elems[pos] = e;
+		pos++;
+	}
+	return *this;
+}
+
+STACK & STACK::pop(int & e) throw(char *)
+{
+	if (0 == pos)
+		throw "exception";
+	e = elems[--pos];
+	return *this;
+}
+
+STACK & STACK::assign(const STACK & s)
+{
+	const_cast<int *>(elems) = new int[s.max];
+	for (int i = 0; i < s.pos; i++) {
+		elems[i] = s.elems[i];
+	}
+	const_cast<int &>(max) = s.max;
+	pos = s.pos;
+	return *this;
+}
+
+std::string STACK::getprint() const
+{
+	std::stringstream res;
+	for (int i = 0; i < pos; i++) {
+		res << elems[i] << " ";
+	}
+	std::string end = pos != 0 ? res.str() : "";
+	return end;
+}
+void STACK::print() const
+{
+	std::cout << getprint() << std::endl;
+}
+
+STACK::~STACK()
+{
+	if (elems) {
+		free(elems);
+		const_cast<int &>(max) = 0;//const_cast change const data
+		pos = 0;
+	}
+
+
+}
+
+
+
+
 
 ofstream write;
 STACK *pStack = nullptr;
@@ -142,7 +259,7 @@ int main(int argc,char *argv[]) {
 	write.close();
 	system("type D:\\WorkSpace\\VS_C\\Cpp_expericen\\Project1\\Debug\\Project2.txt");
 	printf("\n");
-	system("pause");
+	//system("pause");
 	return 0;
 
 }
